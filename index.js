@@ -12,7 +12,7 @@ class MastodonAIInfluencer {
       model: "gemini-1.5-flash",
     });
     this.imageModel = this.genAI.getGenerativeModel({
-      model: "gemini-1.5-flash",
+      model: "gemini-1.5-flash", // You can replace with image model if available
     });
 
     // Mastodon Client Setup
@@ -34,6 +34,7 @@ class MastodonAIInfluencer {
     };
   }
 
+  // Generate text content using Gemini for social media post
   async generateContent(topic) {
     const prompt = `Create an engaging social media post about ${topic} from the perspective of a tech-savvy AI researcher. 
         Include insights, a thought-provoking statement, and maintain a professional yet approachable tone. Strictly keep it under 500 characters`;
@@ -47,17 +48,43 @@ class MastodonAIInfluencer {
     }
   }
 
+  // Generate image using Hugging Face for a professional representation of the topic
+  // Generate image using Hugging Face for a professional representation of the topic
   async generateImage(topic) {
     const imagePrompt = `Create a professional, modern illustration representing ${topic} in technology. 
-        Use a clean, minimalist design with tech-inspired elements.`;
+    Use a clean, minimalist design with tech-inspired elements.`;
 
     try {
-      const result = await this.imageModel.generateContent(imagePrompt);
+      // Hugging Face API call for image generation
+      const response = await axios.post(
+        "https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-3-medium-diffusers",
+        {
+          inputs: imagePrompt,
+          guidance_scale: 7.5, // Optional, for better results
+          num_inference_steps: 50, // Optional, adjust for image quality
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${process.env.HUGGINGFACE_API_KEY}`,
+            "Content-Type": "application/json",
+          },
+          responseType: "arraybuffer", // Ensure we get raw binary data for the image
+        }
+      );
 
-      // Convert image to temporary file
-      const imageBuffer = result.response.image();
+      if (response.status !== 200) {
+        throw new Error(
+          `Hugging Face API Error: ${response.status} - ${response.data}`
+        );
+      }
+
+      // Convert binary response to buffer
+      const imageBuffer = Buffer.from(response.data);
+
+      // Ensure the image is saved with a valid extension
       const tempFilePath = `/tmp/post_image_${Date.now()}.png`;
 
+      // Save the image to a temporary file
       fs.writeFileSync(tempFilePath, imageBuffer);
       return tempFilePath;
     } catch (error) {
@@ -66,6 +93,7 @@ class MastodonAIInfluencer {
     }
   }
 
+  // Post content to Mastodon with or without an image
   async postToMastodon(content, imagePath = null) {
     try {
       let mediaId = null;
@@ -108,6 +136,7 @@ class MastodonAIInfluencer {
     }
   }
 
+  // Generate and schedule content for a list of topics
   async createScheduledContent() {
     const topics = [
       "AI in Sustainable Development",
@@ -134,7 +163,7 @@ class MastodonAIInfluencer {
     }
   }
 
-  // Interactive Response Generation
+  // Interactive Response Generation for user queries
   async generateInteractiveResponse(userMessage) {
     const prompt = `An AI tech influencer is responding to a message. 
         User Message: ${userMessage}
