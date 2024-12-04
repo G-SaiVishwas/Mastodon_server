@@ -159,9 +159,6 @@ class MastodonAIInfluencer {
   // Generate and schedule content for a list of topics
   async createScheduledContent() {
     const topics = [
-      "That Time I Mistook Treasure for Lunch – A funny post where Luffy finds a treasure chest, but it’s full of snacks",
-      "When You Finally Reach the Island… and It’s the Wrong One – A comical take on navigation mishaps",
-      "POV: You Steal the Wrong Ship – Share a funny story of accidentally boarding a rival crew’s ship",
       "When the Crew Says 'Save Some Food for Later,' But You're Starving Now – A hilarious moment of overeating during a feast",
       "That One Time I Tried Cooking... It Didn’t End Well – Share a burnt food disaster story with memes",
       "How I Got Kicked Off the Ship Over the Last Drumstick – A lighthearted tale about fighting over food",
