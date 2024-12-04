@@ -183,7 +183,7 @@ class MastodonAIInfluencer {
         }
 
         // Wait between posts to avoid rate limiting
-        await new Promise((resolve) => setTimeout(resolve, 900000)); // 15 mins
+        await new Promise((resolve) => setTimeout(resolve, 30000)); // 15 mins
       }
     }
   }
